@@ -1,10 +1,13 @@
 import maya.cmds as cmds
 
 def createFields():
+    global spineCount
+    global fingerCount
+    
     #spine
     cmds.text("Spine Count",l = "Spine Count")
     spineCount = cmds.intField(minValue=-10, maxValue=10, value=4)
-    
+
     #Finger
     cmds.text("Finger Amount",l = "Finger Amount")
     fingerCount = cmds.intField(minValue = 1,maxValue = 10, value=5)
@@ -18,7 +21,7 @@ def createLocators():
         cmds.group(em = True , name = "Loc_Master")
     root = cmds.spaceLocator(n = "Loc_ROOT")
     cmds.scale(0.1,0.1,0.1,root)
-    cmds.move(0,1,0,root)
+    cmds.move(0,1.5,0,root)
     cmds.parent(root,"Loc_Master")
     
     createSpine()
@@ -31,10 +34,31 @@ def createSpine():
             cmds.parent(spine,"Loc_ROOT")
         else:
             cmds.parent(spine,"Loc_Spine"+str(i-1))
-        cmds.move(0,1.25 + (0.25 * i),0,spine)
-        
+        cmds.move(0,1.5 + (0.25 * i),0,spine)
+    
+    createHead()
     createArm(1)#Left
     createArm(-1)#Right
+    createLegs(1)#Left
+    createLegs(-1)#Right
+    setColors()
+    
+
+def createHead():
+    neck = cmds.spaceLocator(n = 'Loc_Neck_Start')
+    cmds.parent(neck,'Loc_Spine' + str(cmds.intField(spineCount,query = True,value = True) - 1))
+    cmds.scale(1,1, 1, neck)
+    cmds.move(0,1.6 + (0.25 * 2), 0, neck) 
+    
+    neck = cmds.spaceLocator(n = 'Loc_Neck_End')
+    cmds.parent(neck, 'Loc_Neck_Start')
+    cmds.scale(1,1, 1, neck)
+    cmds.move(0,1.75 + (0.25 * 2), 0, neck) 
+    
+    head = cmds.spaceLocator(n = 'Loc_Head')
+    cmds.parent(head, 'Loc_Neck_End')
+    cmds.scale(1,1,1, head)
+    cmds.move(0,2+(0.25 * 2),0, head)
     
 def createArm(side):
     
@@ -130,4 +154,104 @@ def createFinger(side,handPos,count):
                 cmds.parent(finger, 'Loc_R_Finger_' + str(count+1) + '_' + str(x - 1))
             cmds.move(handPos[0] + (0.1 + (0.1 * x)) * side, handPos[1] - (0.1 + (0.1 *x)), handPos[2] + -(0.05 * count), finger)
             
+def createLegs(side):
+    if side == 1:
+        #Left Leg
+        if cmds.objExists('L_Leg_GRP'):
+            print ("L_Leg_GRP already exists")
+        else:
+            upperLegGRP = cmds.group(em = True, name = 'L_Leg_GRP')
+            cmds.parent(upperLegGRP,'Loc_ROOT')
+            cmds.move(0.1,1,0,upperLegGRP)
+        
+        upperLeg = cmds.spaceLocator(n = 'Loc_L_UpperLeg')
+        cmds.scale(0.1,0.1,0.1, upperLeg)
+        cmds.move(0.15, 1.5, 0, upperLeg)
+        cmds.parent(upperLeg, 'L_Leg_GRP')
+        
+        ## lower leg
+        lowerLeg = cmds.spaceLocator(n = 'Loc_L_LowerLeg')
+        cmds.scale(0.1,0.1,0.1, lowerLeg)
+        cmds.move(0.15,0.75, 0.05, lowerLeg)
+        cmds.parent(lowerLeg, 'Loc_L_UpperLeg')
+        
+        ## foot
+        foot = cmds.spaceLocator(n = 'Loc_L_Foot')
+        cmds.scale(0.1, 0.1, 0.1, foot)
+        cmds.move(0.15, 0.2, 0, foot)
+        cmds.parent(foot, 'Loc_L_LowerLeg')
+        
+        ## football
+        
+        football = cmds.spaceLocator(n = 'Loc_L_FootBall')
+        cmds.scale(0.1,0.1,0.1, football)
+        cmds.move(0.15, 0, 0.15, football)
+        cmds.parent(football, 'Loc_L_Foot')
+        
+        ## toes
+        
+        toes = cmds.spaceLocator(n = 'Loc_L_Toes')
+        cmds.scale(0.1,0.1,0.1, toes)
+        cmds.move(0.15, 0, 0.3, toes)
+        cmds.parent(toes, 'Loc_L_FootBall')
+        
+    else:
+        #Right
+        if cmds.objExists('R_Leg_GRP'):
+            print ("R_Leg_GRP already exists")
+        else:
+            upperLegGRP = cmds.group(em = True, name = 'R_Leg_GRP')
+            cmds.parent(upperLegGRP,'Loc_ROOT')
+            cmds.move(-0.1,1,0,upperLegGRP)
+        
+        upperLeg = cmds.spaceLocator(n = 'Loc_R_UpperLeg')
+        cmds.scale(0.1,0.1,0.1, upperLeg)
+        cmds.move(-0.15, 1.5, 0, upperLeg)
+        cmds.parent(upperLeg, 'R_Leg_GRP')
+        
+        ## lower leg
+        lowerLeg = cmds.spaceLocator(n = 'Loc_R_LowerLeg')
+        cmds.scale(0.1,0.1,0.1, lowerLeg)
+        cmds.move(-0.15,0.75, 0.05, lowerLeg)
+        cmds.parent(lowerLeg, 'Loc_R_UpperLeg')
+        
+        ## foot
+        foot = cmds.spaceLocator(n = 'Loc_R_Foot')
+        cmds.scale(0.1, 0.1, 0.1, foot)
+        cmds.move(-0.15, 0.2, 0, foot)
+        cmds.parent(foot, 'Loc_R_LowerLeg')
+        
+        ## football
+        
+        football = cmds.spaceLocator(n = 'Loc_R_FootBall')
+        cmds.scale(0.1,0.1,0.1, football)
+        cmds.move(-0.15, 0, 0.15, football)
+        cmds.parent(football, 'Loc_R_Foot')
+        
+        ## toes
+        
+        toes = cmds.spaceLocator(n = 'Loc_R_Toes')
+        cmds.scale(0.1,0.1,0.1, toes)
+        cmds.move(-0.15, 0, 0.3, toes)
+        cmds.parent(toes, 'Loc_R_FootBall')
+        
+def setColors():
+    cmds.setAttr('Loc_Master.overrideEnabled', 1)
+    cmds.setAttr('Loc_Master.overrideRGBColors', 1)
     
+def mirrorLocators():
+    allLeftLocators = cmds.ls("Loc_L_*")
+    leftLocators = cmds.listRelatives(*allLeftLocators,p = True,f = True)
+    #listRelatives = 계층구조로 된 object의 부모와 자식 정보얻기 , f = fullpath
+    allRightLocators = cmds.ls("Loc_R_*")
+    rightLocators = cmds.listRelatives(*allRightLocators,p = True,f = True)
+    #enumerate 내장함수 = for 루프돌리기
+    for i,l in enumerate(leftLocators):
+        #위치값을 알아올땐 x,y,z 때문에 2개 이상이므로 변수명 뒤에 []를 붙인다.
+        #점,면의 위치,회전,스케일등의 값을 알아오는 명령어는 xform = 트랜스폼 노드의 요소(element)관련값 가져옴.
+        pos = cmds.xform(l,q = True,t = True,ws = True)
+        cmds.move(-pos[0],pos[1],pos[2],rightLocators[i])
+
+def deleteLocators():
+    nodes = cmds.ls("Loc_*")
+    cmds.delete(nodes)
