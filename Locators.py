@@ -3,16 +3,13 @@ import maya.cmds as cmds
 def createFields():
     global spineCount
     global fingerCount
-    
     #spine
     cmds.text("Spine Count",l = "Spine Count")
     spineCount = cmds.intField(minValue=-10, maxValue=10, value=4)
-
+    
     #Finger
     cmds.text("Finger Amount",l = "Finger Amount")
     fingerCount = cmds.intField(minValue = 1,maxValue = 10, value=5)
-    
-    cmds.button(l = "Edit Mode", w = 200, c = "lockAll(editMode)")
 
 def createLocators():
     if cmds.objExists("Loc_Master"):
@@ -68,10 +65,16 @@ def createArm(side):
         else:
             #L_arm = cmds.group(em = True , name = "Loc_L_Arm_GRP")
             #cmds.parent(L_arm,"Loc_Spine"+str(cmds.intField(spineCount,query = True,value = True)-1))
+            #clavicle start
+            clavicle = cmds.spaceLocator(n = 'Loc_L_Clavicle')
+            cmds.scale(0.1,0.1,0.1, clavicle)
+            cmds.parent(clavicle, "Loc_Spine"+str(cmds.intField(spineCount,query = True,value = True)-1))
+            cmds.move(0.1 * side, 1.5 + (0.25 * cmds.intField(spineCount,query = True,value = True)), 0.1, clavicle)
+
             #Upper Arm
             UpperArm = cmds.spaceLocator(n= "Loc_L_UpperArm")
             cmds.scale(0.1,0.1,0.1,UpperArm)
-            cmds.parent(UpperArm,"Loc_Spine"+str(cmds.intField(spineCount,query = True,value = True)-1))
+            cmds.parent(UpperArm,'Loc_L_Clavicle')
             #cmds.parent(UpperArm,L_arm)
             #Lower Arm
             LowerArm = cmds.spaceLocator(n= "Loc_L_LowerArm")
@@ -94,10 +97,15 @@ def createArm(side):
         else:
             #R_arm = cmds.group(em = True , name = "Loc_R_Arm_GRP")
             #cmds.parent(R_arm,"Loc_Spine"+str(cmds.intField(spineCount,query = True,value = True)-1))
+            #clavicle start
+            clavicle = cmds.spaceLocator(n = 'Loc_R_Clavicle')
+            cmds.scale(0.1,0.1,0.1, clavicle)
+            cmds.parent(clavicle, "Loc_Spine"+str(cmds.intField(spineCount,query = True,value = True)-1))
+            cmds.move(0.1 * side, 1.5 + (0.25 * cmds.intField(spineCount,query = True,value = True)), 0.1, clavicle)
             #Upper Arm
             UpperArm = cmds.spaceLocator(n= "Loc_R_UpperArm")
             cmds.scale(0.1,0.1,0.1,UpperArm)
-            cmds.parent(UpperArm,"Loc_Spine"+str(cmds.intField(spineCount,query = True,value = True)-1))
+            cmds.parent(UpperArm,'Loc_R_Clavicle')
             #Lower Arm
             LowerArm = cmds.spaceLocator(n= "Loc_R_LowerArm")
             cmds.scale(0.1,0.1,0.1,LowerArm)
